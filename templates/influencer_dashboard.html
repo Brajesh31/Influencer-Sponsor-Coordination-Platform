@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Influencer Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+    <div id="container">
+        <!-- NAVIGATION BAR -->
+        <div id="panel">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <div class="container-fluid">
+                    <label class="navbar-brand">{{ fname }} {{ lname }}'s Dashboard</label>
+                    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                        <div class="navbar-nav">
+                            <a class="nav-link active" href="/influencer_dashboard/{{ influencer_id }}">Profile</a>
+                            <a class="nav-link" href="/influencer_find/{{ influencer_id }}">Find</a>
+                            <a class="nav-link" href="/influencer_statistics/{{ influencer_id }}">Statistics</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <div class="container">
+            <div class="row my-4">
+
+                {% for key, value in influencer_info.items() %}
+                    <div class="col-4 card">
+                        <div class="row">
+                            <h4 class="text-center mt-2">Your Details</h4>
+                        </div>
+                        <div class="row">
+                            <li><u>Name</u>: {{ value.fname }} {{ value.lname }}</li>
+                            <li><u>Username</u>: {{ value.username }}</li>
+                            <li><u>Email</u>: {{ value.email }}</li>
+                            <li><u>Earnings so far</u>: {{ value.earning }}</li>
+                            <li><u>Associated Accounts</u>:</li>
+                            <ul class="list-unstyled">
+                                {% for account, info in value.social_accounts.items() %}
+                                    <i>{{ account }}:</i>
+                                    <ul>
+                                        <li>Followers count: {{ info.followers }}</li>
+                                        <li>Profile Link: <a href="{{ info.profile_link }}" target="_blank">{{ info.profile_link }}</a></li>
+                                    </ul>
+                                {% endfor %}
+                            </ul>
+                            <li><u>Niches of Influencer</u>:</li>
+                            <ul class="list-unstyled">
+                                {% for niche in value.niches %}
+                                    <ul>
+                                        <li>{{ niche }}</li>
+                                    </ul>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <div class="col-8 card">
+                    <div class="row">
+                        <h4 class="text-center mt-2">Welcome {{ fname }} {{ lname }}</h4>
+                    </div>
+
+                    <div class="row">
+                        <!-- ACTIVE AD REQUESTS -->
+                        <div class="row">
+                            <h5 class="text-center"><br>Active Ads</h5>
+
+                            {% if active_ads %}
+                                {% for key, value in active_ads.items() %}
+                                    <div class="col-sm-6">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">{{ value.ad_title }}</h6>   <!-- ad title-->
+                                                <ul class="card-text">
+                                                    <li><u>Associated Campaign Title</u>: {{ value.campaign_title }} </li>
+                                                    <li><u>Payment Amount</u>: {{ value.payemnt_amount }}</li>
+                                                    <li><u>Timeline</u>: {{ value.sdate }} - {{ value.edate }}</li>
+                                                    <i>Ad progress: </i>
+                                                    <div class="progress">
+                                                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ value.progress }}%" aria-valuenow="{{ value.progress }}" aria-valuemin="0" aria-valuemax="100">{{ value.progress }}%</div>
+                                                    </div>                                            
+                                                </ul>
+                                                <!-- VIEW ACTIVE AD REQ MODAL TRIGGER BUTTON -->
+                                                <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewActiveAdRequestModal{{ key }}">View</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+
+                            {% else %}
+                                <h6 class="text-secondary">You have no active ads.</h6>
+                            {% endif %}
+
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- NEW REQUESTS -->
+                        <!-- These are the 'pending' requests that have been given to this influencer by a sponsor and are yet to accepted/rejected-->
+                        <div class="row">
+                            <h5 class="text-center"><br>New Requests</h5>
+                            <h6 class="text-secondary text-center">(These are the ads assigned to you by sponsors)</h6>
+
+                            {% if pending_ads %}
+                                {% for key, value in pending_ads.items() %}
+                                    <div class="col-sm-6 mb-2">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">{{ value.ad_title }} </h6>       <!-- ad title-->
+                                                <ul class="card-text">
+                                                    <li><u>Associated Campaign Title</u>: {{ value.campaign_title }} </li>
+                                                    <li><u>Requesting Sponsor</u>: {{ value.sponsor_fname }}{{ value.sponsor_lname }} <br></li>
+                                                    <li><u>Payment Amount</u>: {{ value.payemnt_amount }}</li>
+                                                    <li><u>Timeline</u>: {{ value.sdate }} - {{ value.edate }}</li>
+                                                </ul>
+                                                <!-- VIEW NEW AD REQUEST MODAL TRIGGER BUTTON -->
+                                                <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewNewAdRequestModal{{ key }}">View</button>
+                                                <!-- key here denotes the ad_id -->
+                                                <a href="/influencer_dashboard/accept_ad_request/{{ influencer_id }}/{{ key }}" class="btn btn-outline-success btn-sm">Accept</a>
+                                                <a href="/influencer_dashboard/reject_ad_request/{{ influencer_id }}/{{ key }}" class="btn btn-outline-danger btn-sm">Reject</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            
+                            {% else %}
+                                <h6 class="text-secondary">You have no new ad requests.</h6>
+                            {% endif %}
+
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- REQUESTED REQUESTS -->
+                        <!-- These are the 'requested' requests that the influencer has requested for and are yet to accepted/rejected by the sponsor -->
+                        <div class="row">
+                            <h5 class="text-center"><br>Requested Ads</h5>
+                            <h6 class="text-secondary text-center">(These are the ads you have requested to work on)</h6>
+
+                            {% if requested_ads %}
+                                {% for key, value in requested_ads.items() %}
+                                    <div class="col-sm-6 mb-2">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">{{ value.ad_title }} </h6>                <!-- ad title-->
+                                                <ul class="card-text">
+                                                    <li><u>Associated Campaign Title</u>: {{ value.campaign_title }} </li>
+                                                    <li><u>Payment Amount</u>: {{ value.payemnt_amount }}</li>
+                                                    <li><u>Timeline</u>: {{ value.sdate }} - {{ value.edate }}</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            
+                            {% else %}
+                                <h6 class="text-secondary">You have not requested for any ads.</h6>
+                            {% endif %}
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+
+        {% for key, value in pending_ads.items() %}
+            <!-- VIEW NEW AD REQUEST MODAL -->
+            <div class="modal fade" id="viewNewAdRequestModal{{ key }}" tabindex="-1" aria-labelledby="viewNewAdRequestModalLabel{{ key }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="viewNewAdRequestModalLabel{{ key }}">Ad Request</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <ul class="mb-3">
+                                <li><u>Ad Title</u>: {{ value.ad_title }} </li>
+                                <li><u>Campaign title</u>: {{ value.campaign_title }} </li>
+                                <li><u>Sponsor</u> (company/individual): {{ value.sponsor_type }} </li>
+                                <li><u>Niche</u>: {{ value.niche }} </li>
+                                <li><u>Requirement</u>: {{ value.ad_requirement }} </li> 
+                                <li><u>Timeline</u>: {{ value.sdate }} - {{ value.edate }} </li>
+                                <li><u>Payment Amount</u>: {{ value.payment_amount }} </li>
+                            </ul>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-success">Accept</button>
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Reject</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+
+        {% for key,value in active_ads.items() %}
+            <!-- VIEW ACTIVE AD REQUEST MODAL -->
+            <div class="modal fade" id="viewActiveAdRequestModal{{ key }}" tabindex="-1" aria-labelledby="viewActiveAdRequestModalLabel{{ key }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="viewActiveAdRequestModalLabel{{ key }}">Ad Request</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <ul class="mb-3">
+                                <li><u>Ad Title</u>: {{ value.ad_title }} </li>
+                                <li><u>Campaign title</u>: {{ value.campaign_title }} </li>
+                                <li><u>Sponsor</u> (company/individual): {{ value.sponsor_type }} </li>
+                                <li><u>Niche</u>: {{ value.niche }} </li>
+                                <li><u>Requirement</u>: {{ value.ad_requirement }} </li> 
+                                <li><u>Timeline</u>: {{ value.sdate }} - {{ value.edate }} </li>
+                                <li><u>Payment Amount</u>: {{ value.payment_amount }} </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+</body>
+</html>

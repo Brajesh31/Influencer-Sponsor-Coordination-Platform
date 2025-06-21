@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <!-- BOOTSTRAP CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<body>
+    <div id="container">
+        <!-- NAVIGATION BAR -->
+        <div id="panel">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <div class="container-fluid">
+                    <label class="navbar-brand">Admin Dashboard</label>
+                    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                        <div class="navbar-nav">
+                            <a class="nav-link active" aria-current="page" href="/admin_dashboard">Information</a>
+                            <a class="nav-link" href="/admin_find">Find</a>
+                            <a class="nav-link" href="admin_statistics">Statistics</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <!-- ALL ACTIVE CAMPAIGNS -->
+        <div class="container row">
+            <h5 class="text-center"><br>Active Campaigns</h5>
+
+            {% if active_campaigns %}
+                {% for key,value in active_campaigns.items() %}
+                    <div class="col-sm-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ value.title }}</h6>   <!-- Campaign Title -->
+                                <ul class="card-text">
+                                    <li><u>Description</u>: {{ value.description }}</li>
+                                    <li><u>Timeline</u>: {{ value.start_date }} - {{ value.end_date }}</li>
+                                    <i>Campaign progress</i>:   
+                                    <div class="progress">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ value.progress }}%;" aria-valuenow="{{ value.progress }}" aria-valuemin="0" aria-valuemax="100">{{ value.progress }}%</div>
+                                    </div>
+                                </ul>
+                                <a href="/campaign_details/{{ key }}" class="btn btn-outline-primary btn-sm">View</a>
+                                <a href="/flag_campaign/{{ key }}" class="btn btn-outline-danger btn-sm">Flag</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h6 class="text-secondary">No Active Campaigns!</h6>
+            {% endif %}
+        </div>
+
+
+        <!-- FLAGGED CAMPAIGNS -->
+        <div class="container row">
+            <h5 class="text-center"><br>Flagged Campaigns</h5>
+            
+            {% if flagged_campaigns %}
+                {% for key,value in flagged_campaigns.items() %}
+                    <div class="col-sm-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title"> {{ value.title }} </h6>     <!-- Campaign Title -->
+                                <ul class="card-text">
+                                    <li><u>Description</u>: {{ value.description }}</li>
+                                    <li><u>Goal</u>: {{ value.goal }}</li>
+                                    <li><u>Timeline</u>: {{ value.start_date }} - {{ value.end_date }}</li>
+                                </u;>
+                                <a href="/campaign_details/{{ key }}" class="btn btn-outline-primary btn-sm">View</a>
+                                <a href="/unflag_campaign/{{ key }}" class="btn btn-outline-success btn-sm">Unflag</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h6 class="text-secondary">No Flagged Campaigns!</h6>
+            {% endif %}
+        </div>
+
+        <!-- FLAGGED INFLUENCERS -->
+        <div class="container row">
+            <h5 class="text-center"><br>Flagged Influencers</h5>
+
+            {% if flagged_influencers %}
+                {% for key, value in flagged_influencers.items() %}
+                    <div class="col-sm-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title"> {{ value.fname }} {{ value.lname }} </h6>
+                                <ul class="card-text">
+                                    <li><u>Username</u>: {{ value.username }}</li>
+                                    <li><u>Associated Accounts:</u></li>
+                                    {% for account, info in value.social_accounts.items() %}
+                                        <li>
+                                            {{ account }}:
+                                            <ul>
+                                                <li><u>Followers count</u>: {{ info.followers }}</li>
+                                                <li><u>Profile Link</u>: <a href="{{ info.profile_link }}" target="_blank">{{ info.profile_link }}</a></li>
+                                            </ul>
+                                        </li>
+                                    {% endfor %}
+                                    <li><u>Niches of Influencer</u>:</li>
+                                    <ul>
+                                        {% for niche in value.niches %}
+                                            <li>{{ niche }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </ul>
+                                <a href="/unflag_influencer/{{ key }}" class="btn btn-outline-success btn-sm">Unflag</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h6 class="text-secondary">No Flagged Influencers!</h6>
+            {% endif %}
+        </div>
+
+        <!-- FLAGGED SPONSORS -->
+        <div class="container row">
+            <h5 class="text-center"><br>Flagged Sponsors</h5>
+
+            {% if flagged_sponsors %}
+                {% for key, value in flagged_sponsors.items() %}
+                    <div class="col-sm-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title"> {{ value.fname }} {{ value.lname }} </h6>
+                                <p class="card-text">
+                                    <li><u>Username</u>: {{ value.username }} </li>
+                                    <li><u>Type</u>: {{ value.type }} </li>
+                                    <li><u>Industry</u>: {{ value.industry }} </li>
+                                    <li><u>Budget</u>: {{ value.budget }} </li>
+                                    <li><u>Email</u>: {{ value.email }} </li>
+                                </p>
+                                <a href="/unflag_sponsor/{{ key }}" class="btn btn-outline-success btn-sm">Unflag</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h6 class="text-secondary">No Flagged Sponsors!</h6>
+            {% endif %}
+        </div>
+        
+    </div>
+</body>
+</html>

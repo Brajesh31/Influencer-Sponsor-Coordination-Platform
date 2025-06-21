@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campaign Details for Sponsor</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+    <div id="container">
+        <!-- NAVIGATION BAR -->
+        <div id="panel">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <div class="container-fluid">
+                    <label class="navbar-brand">{{ first_name }} {{ last_name }}'s Dashboard</label>
+                    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                        <div class="navbar-nav">
+                            <a class="nav-link" aria-current="page" href="/sponsor_dashboard/{{ sponsor_id }}">Profile</a>
+                            <a class="nav-link active" href="/sponsor_all_campaigns/{{ sponsor_id }}">Campaign</a>
+                            <a class="nav-link" href="/sponsor_find/{{ sponsor_id }}">Find</a>
+                            <a class="nav-link" href="/sponsor_statistics/{{ sponsor_id }}">Statistics</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        
+        <!-- CAMPAIGN DESCRIPTION -->
+        {% for key, value in campaign_info.items() %}
+            {% if value.flagged %}
+                <h4 class="text-danger">The campaign has been flagged for inapropriate content!</h4>
+
+            {% else %}
+                <div class="container row mt-4">
+                    <h4>{{ value.title }}</h4>
+                    <ul>
+                        <li><u>Description</u>: {{ value.description }}</li>
+                        <li><u>Visibility</u>: {{ value.visibility }}</li>
+                        <li><u>Goal</u>: {{ value.goal }}</li>
+                        <li><u>Timeline</u>: {{ value.start_date }} - {{ value.end_date }}</li>
+                        <li><u>Budget</u>: {{ value.budget }} </li>
+                    </ul>
+                </div>
+
+                <!-- AD REQUEST CARDS -->
+                <div class="container row">
+                    <h5 class="text-center mb-4">Ad Requests</h5>
+                    {% for id, details in value.ads.items() %}
+                        {% if id %}
+                            <div class="col-sm-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">{{ details.title }}</h6>
+                                        <ul class="card-text">
+                                            <li><u>Requirements</u>: {{ details.requirements }} </li>
+                                            <li><u>Payment Amount</u>: {{ details.payment_amount }}</li>
+                                            <li><u>Influencer Assigned</u>: {{ details.influencer_fname }} {{ details.influencer_lname }}</li>
+                                            <li><u>Status</u>: {{ details.status }}</li>
+                                            <li><u>Niche</u>: {{ details.niche }}</li>
+                                        </ul>
+                                        <!-- EDIT MODAL TRIGGER BUTTON -->
+                                        <button type="button" class=" btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#editAdRequestModal{{ key}}{{ id }}">Edit</button>
+                                        <button type="button" class=" btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteAdRequestModal{{ key }}{{ id }}">Delete</button>
+                                        {% if not details.influencer_id %}
+                                            <a href="/find_influencer_for_ad/{{ sponsor_id }}/{{ key }}/{{ id }}" class="btn btn-warning btn-sm">Find Influencer</a>      <!-- key here is the camp_id and id is the ad_id-->
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <h6 class="text-secondary">No ad requests initiated in this campaign</h6>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            
+            {% if error %} <p class="text-danger text-center">{{ error }} </p> {% endif %}
+            <!-- ADD AD REQUEST MODAL TRIGGER BUTTON -->
+            <div class="text-center mt-4">
+                <button type="button" class=" btn btn-success" data-bs-toggle="modal" data-bs-target="#adRequestModal{{ key }}">Create New Ad Request</button>
+            </div>
+
+        {% endfor %}
+
+
+        {% for key, value in campaign_info.items() %}
+            <!-- ADD AD REQUEST MODAL -->
+            <div class="modal fade" id="adRequestModal{{ key }}" tabindex="-1" aria-labelledby="adRequestModalLabel{{ key }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="adRequestModalLabel{{ key }}">Create New Ad Request</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="adRequestForm" method="POST" action="/new_ad_request/{{ sponsor_id}}/{{ key }}">
+                                <div class="mb-3">
+                                    <label for="adTitle" class="form-label">Ad Request Title</label>
+                                    <input type="text" class="form-control" id="adTitle" name="adTitle" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="adRequirement" class="form-label">Requirement</label>
+                                    <textarea class="form-control" id="adRequirement" name="adRequirement" rows="3" required></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="adNiche" class="form-label">Niche</label>
+                                    <select class="form-control" id="adNiche" name="adNiche" required>
+                                        {% for niche in niches %}
+                                            <option value="{{ niche.id }}">{{ niche.name }}</option>
+                                        {% endfor %}
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3" id="otherNicheDiv" style="display: none;">
+                                    <label for="otherNiche" class="form-label">New Niche</label>
+                                    <input type="text" class="form-control" id="otherNiche" name="otherNiche">
+                                </div>
+                                
+                                <script>
+                                    document.getElementById('adNiche').addEventListener('change', function() {
+                                        var otherNicheDiv = document.getElementById('otherNicheDiv');
+                                        if (this.value === 'other') {
+                                            otherNicheDiv.style.display = 'block';
+                                        } else {
+                                            otherNicheDiv.style.display = 'none';
+                                        }
+                                    });
+                                </script>
+
+                                <div class="mb-3">
+                                    <label for="adPaymentAmount" class="form-label">PaymentAmount</label>
+                                    <input type="number" class="form-control" id="adPaymentAmount" name="adPaymentAmount" required>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Discard</button>
+                                    <button type="submit" class="btn btn-success">Add</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+
+        {% for key, value in campaign_info.items() %}
+            {% for id, details in value.ads.items() %}
+                <!-- EDIT AD REQUEST MODAL -->
+                <div class="modal fade" id="editAdRequestModal{{ key}}{{ id }}" tabindex="-1" aria-labelledby="editAdRequestModalLabel{{ key}}{{ id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editAdRequestModalLabel{{ key }}{{ id }}">Edit Ad Request</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="editAdRequestForm{{ key }}{{ id }}" method="POST" action="/edit_ad/{{ sponsor_id }}/{{ key }}/{{ id }}">
+                                    <div class="mb-3">
+                                        <label for="adTitle" class="form-label">Ad Request Title</label>
+                                        <input type="text" class="form-control" id="adTitle" value="{{ details.title }}" name="adTitle" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="adRequirement" class="form-label">Requirement</label>
+                                        <textarea class="form-control" id="adRequirement" name="adRequirement" rows="3" required>{{ details.requirements }}</textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="adNiche" class="form-label">Niche</label>
+                                        <select class="form-control" id="adNiche" name="adNiche" required>
+                                            {% for niche in niches %}
+                                                <option value="{{ niche.id }}" {% if niche.id == details.niche_id %} selected {% endif %} >{{ niche.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="adPaymentAmount" class="form-label">PaymentAmount</label>
+                                        <input type="number" class="form-control" id="adPaymentAmount" value="{{ details. payment_amount}}" name="adPaymentAmount" required>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Discard</button>
+                                        <button type="submit" class="btn btn-success">Save</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+
+        {% for key, value in campaign_info.items() %}
+            {% for id, details in value.ads.items() %}
+                <!-- DELETE AD REQUEST MODAL -->
+                <div class="modal fade" id="deleteAdRequestModal{{ key}}{{ id }}" tabindex="-1" aria-labelledby="deleteAdRequestModalLabel{{ key}}{{ id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteAdRequestModalLabel{{ key}}{{ id }}">Delete Ad Request</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="deleteAdRequestForm{{ key }}{{ id }}" method="POST" action="/delete_ad/{{ sponsor_id }}/{{ key }}/{{ id }}">
+                                    <div class="mb-3">
+                                        <label for="adTitle" class="form-label">Ad Request Title</label>
+                                        <input type="text" class="form-control" id="adTitle" value="{{ details.title }}" name="adTitle" readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="adRequirement" class="form-label">Requirement</label>
+                                        <textarea class="form-control" id="adRequirement" name="adRequirement" rows="3" readonly>{{ details.requirements }}</textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="adNiche" class="form-label">Niche</label>
+                                        <select class="form-control" id="adNiche" name="adNiche" disabled>
+                                            {% for niche in niches %}
+                                                <option value="{{ niche.id }}" {% if niche.id == details.niche_id %} selected {% endif %} >{{ niche.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="adPaymentAmount" class="form-label">PaymentAmount</label>
+                                        <input type="number" class="form-control" id="adPaymentAmount" name="adPaymentAmount" value="{{ details.payment_amount }}" readonly>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+
+    </div>
+</body>
+</html>

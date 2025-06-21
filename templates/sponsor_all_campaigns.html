@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campaign</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+    <div id="container">
+        <!-- NAVIGATION BAR -->
+        <div id="panel">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <div class="container-fluid">
+                    <label class="navbar-brand">{{ first_name }} {{ last_name }}'s Dashboard</label>
+                    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                        <div class="navbar-nav">
+                            <a class="nav-link" aria-current="page" href="/sponsor_dashboard/{{ sponsor_id }}">Profile</a>
+                            <a class="nav-link active" href="/sponsor_all_campaigns/{{ sponsor_id }}">Campaign</a>
+                            <a class="nav-link" href="/sponsor_find/{{ sponsor_id }}">Find</a>
+                            <a class="nav-link" href="/sponsor_statistics/{{ sponsor_id }}">Statistics</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <!-- ACTIVE CAMPAIGN CARDS -->
+        <div class="container row">
+            <h5 class="text-center my-4">Active Campaigns</h5>
+
+            {% if active_campaigns %}
+                {% for key, value in active_campaigns.items() %}
+                    <div class="col-sm-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ value.title }}</h6>
+                                <ul class="card-text">
+                                    <li><u>Description</u>: {{ value.description }}</li>
+                                    <li><u>Visibility</u>: {{ value.visibility }}</li>
+                                    <li><u>Goal</u>: {{ value.goal }}</li>
+                                    <li><u>Timeline</u>: {{ value.start_date }} - {{ value.end_date }}</li>
+                                </ul>
+                                <i>Campaign progress</i>:
+                                <div class="progress">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ value.progress }}%" aria-valuenow="{{ value.progress }}" aria-valuemin="0" aria-valuemax="100">{{ value.progress }}%</div>
+                                </div> <br>
+                                <a href="/campaign_details/{{ sponsor_id }}/{{ key }}" class="btn btn-outline-primary btn-sm">View</a>
+                                <!-- EDIT MODAL TRIGGER BUTTON -->
+                                <button type="button" class=" btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#editCampaignModal{{ key }}">Edit</button>
+                                <!-- DELETE MODAL TRIGGER BUTTON -->
+                                <button type="button" class=" btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteCampaignModal{{ key }}">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h6 class="text-secondary">You have no active campaigns</h6>
+            {% endif %}
+        </div>
+
+
+        <!-- SCHEDULED CAMPAIGN CARDS -->
+        <div class="container row">
+            <h5 class="text-center my-4">Scheduled Campaigns</h5>
+
+            {% if scheduled_campaigns %}
+                {% for key, value in scheduled_campaigns.items() %}
+                    <div class="col-sm-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ value.title }}</h6>
+                                <ul class="card-text">
+                                    <li><u>Description</u>: {{ value.description }}</li>
+                                    <li><u>Visibility</u>: {{ value.visibility }}</li>
+                                    <li><u>Goal</u>: {{ value.goal }}</li>
+                                    <li><u>Timeline</u>: {{ value.start_date }} - {{ value.end_date }}</li>
+                                    <li><u>Budget</u>: {{ value.budget }} </li>
+                                </ul>
+                                <a href="/campaign_details/{{ sponsor_id }}/{{ key }}" class="btn btn-outline-primary btn-sm">View</a>
+                                <!-- EDIT MODAL TRIGGER BUTTON -->
+                                <button type="button" class=" btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#editCampaignModal{{ key }}">Edit</button>
+                                <!-- DELETE MODAL TRIGGER BUTTON -->
+                                <button type="button" class=" btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteCampaignModal{{ key }}">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h6 class="text-secondary">No campaigns scheduled.</h6>
+            {% endif %}
+        </div>
+
+
+        <!-- COMPLETED CAMPAIGN CARDS -->
+        <div class="container row">
+            <h5 class="text-center my-4">Completed Campaigns</h5>
+
+            {% if completed_campaigns %}
+                {% for key, value in completed_campaigns.items() %}
+                    <div class="col-sm-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ value.title }}</h6>
+                                <ul class="card-text">
+                                    <li><u>Description</u>: {{ value.description }}</li>
+                                    <li><u>Visibility</u>: {{ value.visibility }}</li>
+                                    <li><u>Goal</u>: {{ value.goal }}</li>
+                                    <li><u>Timeline</u>: {{ value.start_date }} - {{ value.end_date }}</li>
+                                    <li><u>Budget</u>: {{ value.budget }} </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h6 class="text-secondary">No campaigns completed yet</h6>
+            {% endif %}
+            
+
+            {% if error %} <div class="text-danger text-center">{{ error }}</div>  {% endif %}
+            <!-- ADD CAMPAIGN MODAL TRIGGER BUTTON -->
+            <div class="text-center mt-4">
+                <button type="button" class=" btn btn-success" data-bs-toggle="modal" data-bs-target="#addCampaignModal">+ Add Campaign</button>
+            </div>
+
+        </div>
+
+
+        <!-- ADD CAMPAIGN MODAL -->
+        <div class="modal fade" id="addCampaignModal" tabindex="-1" aria-labelledby="addCampaignModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addCampaignModalLabel">Add New Campaign</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addCampaignForm" method="POST" action="/add_campaign/{{ sponsor_id }}">
+                            <div class="mb-3">
+                                <label for="campaignTitle" class="form-label">Campaign Title</label>
+                                <input type="text" class="form-control" id="campaignTitle" name="campaignTitle" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="campaignDescription" class="form-label">Description</label>
+                                <textarea class="form-control" id="campaignDescription" name="campaignDescription" rows="3" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="campaignBudget" class="form-label">Budget</label>
+                                <input type="number" class="form-control" id="campaignBudget" name="campaignBudget" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="campaignStartDate" class="form-label">Start Date</label>
+                                <input type="date" class="form-control" id="campaignStartDate" name="campaignStartDate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="campaignEndDate" class="form-label">End Date</label>
+                                <input type="date" class="form-control" id="campaignEndDate" name="campaignEndDate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="campaignVisibility" class="form-label">Visibility</label>
+                                <select class="form-control" id="campaignVisibility" name="campaignVisibility" required>
+                                    <option value="public">Public</option>
+                                    <option value="private">Private</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="campaignGoal" class="form-label">Goal</label>
+                                <textarea class="form-control" id="campaignGoal" name="campaignGoal" rows="3" required></textarea>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Discard</button>
+                                <button type="submit" class="btn btn-success">Create</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+        {% for key, value in active_campaigns.items() %}
+            <!-- EDIT CAMPAIGN MODAL FOR ACTIVE CAMPAIGNS -->
+            <div class="modal fade" id="editCampaignModal{{ key }}" tabindex="-1" aria-labelledby="editCampaignModalLabel{{ key }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editCampaignModalLabel{{ key }}">Edit Campaign</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editCampaignForm{{ key }}" method="POST" action="/edit_campaign/{{ sponsor_id }}/{{ key }}">
+                                <div class="mb-3">
+                                    <label for="campaignTitle" class="form-label">Campaign Title</label>
+                                    <input type="text" class="form-control" id="campaignTitle" name="campaignTitle" value="{{ value.title }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="campaignDescription" class="form-label">Description</label>
+                                    <textarea class="form-control" id="campaignDescription" name="campaignDescription" rows="3" required>{{ value.description }}</textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="campaignBudget" class="form-label">Budget</label>
+                                    <input type="number" class="form-control" id="campaignBudget" name="campaignBudget" value="{{ value.budget }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="campaignStartDate" class="form-label">Start Date</label>
+                                    <input type="date" class="form-control" id="campaignStartDate" name="campaignStartDate" value="{{ value.start_date }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="campaignEndDate" class="form-label">End Date</label>
+                                    <input type="date" class="form-control" id="campaignEndDate" name="campaignEndDate" value="{{ value.end_date }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="campaignVisibility" class="form-label">Visibility</label>
+                                    <select class="form-control" id="campaignVisibility" name="campaignVisibility" required>
+                                        <option value="public" {% if value.visibility == 'public' %} selected {% endif %} >Public</option>
+                                        <option value="private" {% if value.visibility == 'private' %} selected {% endif %} >Private</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="campaignGoal" class="form-label">Goal</label>
+                                    <textarea class="form-control" id="campaignGoal" name="campaignGoal" rows="3" required>{{ value.goal }}</textarea>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Discard</button>
+                                    <button type="submit" class="btn btn-success">Save changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+        
+        {% for key, value in active_campaigns.items() %}
+            <!-- DELETE CAMPAIGN MODAL FOR ACTIVE CAMPAIGNS -->
+            <div class="modal fade" id="deleteCampaignModal{{ key }}" tabindex="-1" aria-labelledby="deleteCampaignModalLabel{{ key }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteCampaignModalLabel{{ key }}">Edit Campaign</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="deleteCampaignForm{{ key }}" method="POST" action="/delete_campaign/{{ sponsor_id }}/{{ key }}">
+                                <div class="mb-3">
+                                    <label for="campaignTitle" class="form-label">Campaign Title</label>
+                                    <input type="text" class="form-control" id="campaignTitle" name="campaignTitle" value="{{ value.title }}" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="campaignDescription" class="form-label">Description</label>
+                                    <textarea class="form-control" id="campaignDescription" name="campaignDescription" rows="3" readonly> {{ value.description }} </textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="campaignBudget" class="form-label">Budget</label>
+                                    <input type="number" class="form-control" id="campaignBudget" name="campaignBudget" value="{{ value.budget }}" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="campaignStartDate" class="form-label">Start Date</label>
+                                    <input type="date" class="form-control" id="campaignStartDate" name="campaignStartDate" value="{{ value.start_date }}" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="campaignEndDate" class="form-label">End Date</label>
+                                    <input type="date" class="form-control" id="campaignEndDate" name="campaignEndDate" value="{{ value.end_date }}" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="campaignVisibility" class="form-label">Visibility</label>
+                                    <select class="form-control" id="campaignVisibility" name="campaignVisibility" disabled>
+                                        <option value="public" {% if value.visibility == 'public' %} selected {% endif %}>Public</option>
+                                        <option value="private" {% if value.visibility == 'private' %} selected {% endif %}>Private</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="campaignGoal" class="form-label">Goal</label>
+                                    <textarea class="form-control" id="campaignGoal" name="campaignGoal" rows="3" readonly> {{ value.goal }} </textarea>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+
+
+        {% for key, value in scheduled_campaigns.items() %}
+            <!-- EDIT CAMPAIGN MODAL FOR SCHEDULED CAMPAIGNS -->
+            <div class="modal fade" id="editCampaignModal{{ key }}" tabindex="-1" aria-labelledby="editCampaignModalLabel{{ key }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editCampaignModalLabel{{ key }}">Edit Campaign</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editCampaignForm{{ key }}" method="POST" action="/edit_campaign/{{ sponsor_id }}/{{ key }}">
+                                <div class="mb-3">
+                                    <label for="campaignTitle" class="form-label">Campaign Title</label>
+                                    <input type="text" class="form-control" id="campaignTitle" name="campaignTitle" value="{{ value.title }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="campaignDescription" class="form-label">Description</label>
+                                    <textarea class="form-control" id="campaignDescription" name="campaignDescription" rows="3" required>{{ value.description }}</textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="campaignBudget" class="form-label">Budget</label>
+                                    <input type="number" class="form-control" id="campaignBudget" name="campaignBudget" value="{{ value.budget }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="campaignStartDate" class="form-label">Start Date</label>
+                                    <input type="date" class="form-control" id="campaignStartDate" name="campaignStartDate" value="{{ value.start_date }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="campaignEndDate" class="form-label">End Date</label>
+                                    <input type="date" class="form-control" id="campaignEndDate" name="campaignEndDate" value="{{ value.end_date }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="campaignVisibility" class="form-label">Visibility</label>
+                                    <select class="form-control" id="campaignVisibility" name="campaignVisibility" required>
+                                        <option value="public" {% if value.visibility == 'public' %} selected {% endif %} >Public</option>
+                                        <option value="private" {% if value.visibility == 'private' %} selected {% endif %} >Private</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="campaignGoal" class="form-label">Goal</label>
+                                    <textarea class="form-control" id="campaignGoal" name="campaignGoal" rows="3" required>{{ value.goal }}</textarea>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Discard</button>
+                                    <button type="submit" class="btn btn-success">Save changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+        
+        {% for key, value in scheduled_campaigns.items() %}
+            <!-- DELETE CAMPAIGN MODAL FOR SCHEDULED CAMPAIGNS -->
+            <div class="modal fade" id="deleteCampaignModal{{ key }}" tabindex="-1" aria-labelledby="deleteCampaignModalLabel{{ key }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteCampaignModalLabel{{ key }}">Edit Campaign</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="deleteCampaignForm{{ key }}" method="POST" action="/delete_campaign/{{ sponsor_id }}/{{ key }}">
+                                <div class="mb-3">
+                                    <label for="campaignTitle" class="form-label">Campaign Title</label>
+                                    <input type="text" class="form-control" id="campaignTitle" name="campaignTitle" value="{{ value.title }}" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="campaignDescription" class="form-label">Description</label>
+                                    <textarea class="form-control" id="campaignDescription" name="campaignDescription" rows="3" readonly> {{ value.description }} </textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="campaignBudget" class="form-label">Budget</label>
+                                    <input type="number" class="form-control" id="campaignBudget" name="campaignBudget" value="{{ value.budget }}" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="campaignStartDate" class="form-label">Start Date</label>
+                                    <input type="date" class="form-control" id="campaignStartDate" name="campaignStartDate" value="{{ value.start_date }}" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="campaignEndDate" class="form-label">End Date</label>
+                                    <input type="date" class="form-control" id="campaignEndDate" name="campaignEndDate" value="{{ value.end_date }}" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="campaignVisibility" class="form-label">Visibility</label>
+                                    <select class="form-control" id="campaignVisibility" name="campaignVisibility" disabled>
+                                        <option value="public" {% if value.visibility == 'public' %} selected {% endif %}>Public</option>
+                                        <option value="private" {% if value.visibility == 'private' %} selected {% endif %}>Private</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="campaignGoal" class="form-label">Goal</label>
+                                    <textarea class="form-control" id="campaignGoal" name="campaignGoal" rows="3" readonly> {{ value.goal }} </textarea>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+</body>
+</html>

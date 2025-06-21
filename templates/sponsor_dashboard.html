@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sponsor Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<body>
+    <div id="container">
+        <!-- NAVIGATION BAR -->
+        <div id="panel">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <div class="container-fluid">
+                    <label class="navbar-brand">{{ first_name }} {{ last_name }}'s Dashboard</label>
+                    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                        <div class="navbar-nav">
+                            <a class="nav-link active" aria-current="page" href="/sponsor_dashboard/{{ sponsor_id }}">Profile</a>
+                            <a class="nav-link" href="/sponsor_all_campaigns/{{ sponsor_id }}">Campaign</a>
+                            <a class="nav-link" href="/sponsor_find/{{ sponsor_id }}">Find</a>
+                            <a class="nav-link" href="/sponsor_statistics/{{ sponsor_id }}">Statistics</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <!-- ACTIVE CAMPAIGNS -->
+        <div class="container row">
+            <h5 class="text-center"><br>Active Campaigns</h5>
+
+            {% if active_campaigns %}
+                {% for key, value in active_campaigns.items() %}
+                    <div class="col-sm-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ value.title }}</h6>  <!-- Campaign Title -->
+                                <p class="card-text">
+                                    <li><u>Description</u>: {{ value.description }}</li>
+                                    <li><u>Timeline</u>: {{ value.start_date }} - {{ value.end_date }}</li>
+                                    <i>Campaign progress</i>:
+                                    <div class="progress">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ value.progress }}%" aria-valuenow="{{ value.progress }}" aria-valuemin="0" aria-valuemax="100">{{ value.progress }}%</div>
+                                    </div>
+                                </p>
+                                <a href="/campaign_details/{{ sponsor_id }}/{{ key }}" class="btn btn-outline-primary btn-sm">View</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h6 class="text-secondary">You have no active campaigns</h6>
+            {% endif %}
+        </div>
+
+
+        <!-- NEW/REQUESTED AD REQUESTS -->
+        <!-- these are the requests that an influencer has requested for to the sponsor -->
+        <div class="container row">
+            <h5 class="text-center"><br>New Ad Requests</h5>
+            <h6 class="text-center text-secondary">(Influencers requesting to work on your ads)</h6>
+
+            {% if requested_ad_requests %}
+                {% for key, value in requested_ad_requests.items() %}
+                    <div class="col-sm-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title"> Ad Title: {{ value.ad_title }} </h6>
+                                <p class="card-text">
+                                    <li><u>Associated Campaign Title</u>: {{ value.campaign_title }}</li>
+                                    <li><u>Requesting Influencer</u>: {{ value.influencer_fname }} {{ value.influencer_lname }} </li>
+                                    <ul class="list-unstyled">
+                                        <li>Associated Accounts:</li>
+                                        {% for account, info in value.social_accounts.items() %}
+                                            <li>
+                                                {{ account }}:
+                                                <ul>
+                                                    <li>Followers count: {{ info.followers }}</li>
+                                                    <li>Profile Link: <a href="{{ info.profile_link }}" target="_blank">{{ info.profile_link }}</a></li>
+                                                </ul>
+                                            </li>
+                                        {% endfor %}
+                                        <li>Niches of Influencer:</li>
+                                        <ul>
+                                            {% for niche in value.niches %}
+                                                <li>{{ niche }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </ul>
+                                </p>
+                                <!-- key here denotes the ad_id -->
+                                <a href="/sponsor_dashboard/accept_ad_request/{{ sponsor_id }}/{{ key }}" class="btn btn-outline-success btn-sm">Accept</a>
+                                <a href="/sponsor_dashboard/reject_ad_request/{{ sponsor_id }}/{{ key }}" class="btn btn-outline-danger btn-sm">Reject</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h6 class="text-secondary">No new requests for your ads</h6>
+            {% endif %}
+        </div>
+
+
+        <!-- PENDING AD REQUESTS -->
+        <!-- these are the requests that the sponsor has sent for to an influencer -->
+        <div class="container row">
+            <h5 class="text-center"><br>Pending Ad Requests</h5>
+            <h6 class="text-center text-secondary">(Requests you have assigned to influencers)</h6>
+
+            {% if pending_ad_requests %}
+                {% for key, value in pending_ad_requests.items() %}
+                    <div class="col-sm-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title"> {{ value.ad_title }} </h6>
+                                <p class="card-text">
+                                    <li><u>Associated Campaign Title</u>: {{ value.campaign_title }}</li>
+                                    <li><u>Requested Influencer</u>: {{ value.influencer_fname }} {{ value.influencer_lname }}</li>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h6 class="text-secondary">You have no pending requests</h6>
+            {% endif %}
+        </div>
+
+    </div>
+</body>
+</html>

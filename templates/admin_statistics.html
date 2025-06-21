@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Statistics</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<body>
+    <div id="container">
+        <!-- NAVIGATION BAR -->
+        <div id="panel">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <div class="container-fluid">
+                    <label class="navbar-brand">Admin Dashboard</label>
+                    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item"><a class="nav-link" href="/admin_dashboard">Information</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/admin_find">Find</a></li>
+                            <li class="nav-item"><a class="nav-link active" href="/admin_statistics">Statistics</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+
+        <div class="container">
+            <div class="row mt-4">
+                <div class="col-4">
+                    <h5 class="text-center">Total Influencers and Sponsors</h5>
+                    <img src="/static/statistics/admin/influencers_sponsors_count.png" class="img-fluid" alt="Total Influencers and Sponsors">
+                </div>
+                <div class="col-4">
+                    <h5 class="text-center">Ad Status Distribution</h5>
+                    <img src="/static/statistics/admin/ad_status.png" class="img-fluid" alt="Ad Status Distribution">
+                </div>
+                <div class="col-4">
+                    <h5 class="text-center">Campaign Visibility</h5>
+                    <img src="/static/statistics/admin/campaign_visibility.png" class="img-fluid" alt="Campaign Visibility">
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-4">
+                    <h5 class="text-center">Flagged V/S Unflagged</h5>
+                    <img src="/static/statistics/admin/flagged_unflagged.png" class="img-fluid" alt="Number of Campaigns per Sponsor">
+                </div>
+                <div class="col-4">
+                    <h5 class="text-center">Campaigns per Sponsor</h5>
+                    <img src="/static/statistics/admin/sponsor_campaigns.png" class="img-fluid" alt="Number of Campaigns per Sponsor">
+                </div>
+                <div class="col-4">
+                    <h5 class="text-center">Ads by Niche</h5>
+                    <img src="/static/statistics/admin/ad_niche.png" class="img-fluid" alt="Number of Ads by Niche">
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

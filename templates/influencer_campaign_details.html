@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campaign Details for Influencer</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+    <div id="container">
+        <!-- NAVIGATION BAR -->
+        <div id="panel">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <div class="container-fluid">
+                    <label class="navbar-brand">{{ fname }} {{ lname }}'s Dashboard</label>
+                    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                        <div class="navbar-nav">
+                            <a class="nav-link" aria-current="page" href="/influencer_dashboard/{{ influencer_id}}">Profile</a>
+                            <a class="nav-link active" href="/influencer_find/{{ influencer_id}}">Find</a>
+                            <a class="nav-link" href="/influencer_statistics/{{ influencer_id }}">Statistics</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <!-- CAMPAIGN DESCRIPTION -->
+        {% for key, value in campaign_info.items() %}
+            <div class="container row mt-4">
+                <h4>{{ value.title }}</h4>
+                <ul>
+                    <li><u>Description</u>: {{ value.description }}</li>
+                    <li><u>Goal</u>: {{ value.goal }}</li>
+                    <li><u>Timeline</u>: {{ value.start_date }} - {{ value.end_date }}</li>
+                    <li><u>Visibility</u>: {{ value.visibility }}</li>
+                    <li><u>Budget</u>: {{ value.budget }}</li>
+                </ul>
+            </div>
+
+            <!-- AD REQUEST CARDS -->
+            <div class="container row">
+                <h5 class="text-center mb-4">Ad Requests</h5>
+                {% for id, details in value.ads.items() %}
+                    {% if id %}
+                        <div class="col-sm-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ details.title }}</h6>
+                                    <ul class="card-text">
+                                        <li><u>Requirements</u>: {{ details.requirements }}</li>
+                                            <li><u>Payment Amount</u>: {{ details.payment_amount}}</li> 
+                                            <li><u>Influencer Assigned</u>: {{ details.influencer_fname }} {{ details.influencer_lname }}</li>
+                                            <li><u>Status</u>: {{ details.status }}</li>
+                                            <li><u>Niche</u>: {{ details.niche }}</li>
+                                    </ul>
+                                    <!-- here id denotes the ad_id  -->
+                                    {% if details.influencer_id %}
+                                        <button class="btn btn-secondary btn-sm"><i>Already assigned to an influencer</i></button>
+                                    {% else %}
+                                        <a href="/request_sponsor_for_ad/{{ influencer_id }}/{{ key }}" class="btn btn-outline-success btn-sm">Request</a>    <!-- here key denotes camp_id-->
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <h6 class="text-secondary">This campaign has no ads</h6>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+    </div>
+</body>
+</html>
